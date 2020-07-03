@@ -1,0 +1,127 @@
+
+create table border_crossing.crossing_statistics (
+    port_name varchar(256) comment 'Наименование порта',
+    state varchar(256) comment 'Штат',
+    port_code int comment 'Код порта',
+    border varchar(512) comment 'Граница',
+    cross_date date comment 'Дата и время',
+    measure_unit varchar(128) comment 'Единица измерения',
+    value bigint comment 'Значение',
+    place varchar(512) comment 'Координаты места пересечения')
+row format serde
+    'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+STORED AS INPUTFORMAT
+    'org.apache.hadoop.mapred.TextInputFormat'
+OUTPUTFORMAT 
+    'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+tblproperties (
+    'serialization.null.format'='',
+    'skip.header.line.count'='1')
+;
+
+
+show tables in border_crossing;
+
+show create table border_crossing.crossing_statistics;
+
+/*LOAD DATA INPATH '/user/student5_2/Border_Crossing_Entry_Data.csv' INTO TABLE border_crossing.crossing_statistics;*/
+
+SELECT*FROM border_crossing.crossing_statistics;
+SELECT DISTINCT (state) FROM border_crossing.crossing_statistics;
+
+
+create external table border_crossing.crossing_statistics_partitioned_by_state(
+    port_name varchar(256) comment 'Наименование порта',
+    port_code int comment 'Код порта',
+    border varchar(512) comment 'Граница',
+    cross_date date comment 'Дата и время',
+    measure_unit varchar(128) comment 'Единица измерения',
+    value bigint comment 'Значение',
+    place varchar(512) comment 'Координаты места пересечения')
+PARTITIONED BY 
+    (state varchar(256))
+row format serde
+    'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+;
+
+
+INSERT INTO border_crossing.crossing_statistics_partitioned_by_state PARTITION(state='various_states')
+    SELECT port_name, port_code, border, cross_date, measure_unit, value, place FROM border_crossing.crossing_statistics;
+    
+
+
+create external table border_crossing.crossing_statistics_arizona(
+    port_name varchar(256) comment 'Наименование порта',
+    state varchar(256) comment 'Штат',
+    port_code int comment 'Код порта',
+    border varchar(512) comment 'Граница',
+    cross_date date comment 'Дата и время',
+    measure_unit varchar(128) comment 'Единица измерения',
+    value bigint comment 'Значение',
+    place varchar(512) comment 'Координаты места пересечения')
+row format serde
+    'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+;
+
+
+INSERT INTO border_crossing.crossing_statistics_arizona 
+    SELECT *FROM border_crossing.crossing_statistics
+        WHERE state='Arizona';
+        
+SELECT COUNT(*) FROM border_crossing.crossing_statistics_arizona;
+
+create external table border_crossing.crossing_statistics_new_york(
+    port_name varchar(256) comment 'Наименование порта',
+    state varchar(256) comment 'Штат',
+    port_code int comment 'Код порта',
+    border varchar(512) comment 'Граница',
+    cross_date date comment 'Дата и время',
+    measure_unit varchar(128) comment 'Единица измерения',
+    value bigint comment 'Значение',
+    place varchar(512) comment 'Координаты места пересечения')
+row format serde
+    'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+;
+    
+
+INSERT INTO border_crossing.crossing_statistics_new_york
+    SELECT *FROM border_crossing.crossing_statistics
+        WHERE state='New York';
+        
+SELECT COUNT(*) FROM border_crossing.crossing_statistics_new_york;
+
+create external table border_crossing.crossing_statistics_north_dakota(
+    port_name varchar(256) comment 'Наименование порта',
+    state varchar(256) comment 'Штат',
+    port_code int comment 'Код порта',
+    border varchar(512) comment 'Граница',
+    cross_date date comment 'Дата и время',
+    measure_unit varchar(128) comment 'Единица измерения',
+    value bigint comment 'Значение',
+    place varchar(512) comment 'Координаты места пересечения')
+row format serde
+    'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+;
+
+
+
+INSERT INTO border_crossing.crossing_statistics_north_dakota
+    SELECT *FROM border_crossing.crossing_statistics
+        WHERE state='North Dakota';
+        
+SELECT COUNT(*) FROM border_crossing.crossing_statistics_north_dakota;
+
+show tables in border_crossing;
+
+
+
+select state,measure_unit,sum(value) as total
+    from border_crossing.crossing_statistics
+        group by measure_unit,state
+            order by state asc, total desc;
+            
+select sny.state,sny.value,snd.state,snd.value from border_crossing.crossing_statistics_north_dakota as snd
+    full outer join border_crossing.crossing_statistics_new_york as sny
+        on snd.measure_unit=sny.measure_unit and snd.port_code=sny.port_code
+            and snd.cross_date=sny.cross_date;
+    
