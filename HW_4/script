@@ -1,0 +1,41 @@
+
+   
+   
+   create external table bigdata.bigtable_orc_t(
+    oci string,
+    citing string,
+    cited string,
+    creation string,
+    timespan string,
+    journal_sc string,
+    author_sc string
+    )
+   STORED AS orc
+   tblproperties("orc.compress"="NONE");
+
+
+create external table bigdata.bigtable_orc_t_compr(
+    oci string,
+    citing string,
+    cited string,
+    creation string,
+    timespan string,
+    journal_sc string,
+    author_sc string
+    )
+   STORED AS orc
+   tblproperties ("orc.compress"="SNAPPY");
+
+
+show create table bigdata.bigtable_orc_t_compr;
+
+
+insert into bigdata.bigtable_orc_t select*from hive_db.citation_data;
+    
+    
+insert into bigdata.bigtable_orc_t_compr select*from hive_db.citation_data;
+
+    
+select count(*) from bigdata.bigtable_orc;
+
+show create table bigdata.bigtable_orc_t;
