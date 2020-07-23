@@ -1,0 +1,23 @@
+# Please paste flume.conf here. Example:
+
+# Sources, channels, and sinks are defined per
+# agent name, in this case 'tier1'.
+hw5.sources  = SomeSource
+hw5.channels = SomeChannel
+hw5.sinks    = SomeSink
+
+# For each source, channel, and sink, set
+# standard properties.
+hw5.sources.SomeSource.type     = exec
+hw5.sources.SomeSource.command= python /tmp/Test.py
+hw5.sources.SomeSource.bind     = 89.208.230.116
+hw5.sources.SomeSource.channels = SomeChannel
+hw5.channels.SomeChannel.type   = memory
+hw5.sinks.SomeSink.type         = hdfs
+hw5.sinks.SomeSink.hdfs.path= /hw_flume5_2/
+hw5.sinks.SomeSink.channel     = SomeChannel
+
+# Other properties are specific to each type of
+# source, channel, or sink. In this case, we
+# specify the capacity of the memory channel.
+hw5.channels.SomeChannel.capacity = 5000
