@@ -1,0 +1,35 @@
+# Please paste flume.conf here. Example:
+
+# Sources, channels, and sinks are defined per
+# agent name, in this case 'tier1'.
+hw5.sources  = SomeSource
+hw5.channels = SomeChannel SomeChannelHbase
+hw5.sinks    = SomeSink SomeSinkHbase
+
+# For each source, channel, and sink, set
+# standard properties.
+hw5.sources.SomeSource.type     = exec
+hw5.sources.SomeSource.command= python /tmp/Test.py
+hw5.sources.SomeSource.bind     = 89.208.230.116
+hw5.sources.SomeSource.channels = SomeChannel SomeChannelHbase
+hw5.channels.SomeChannel.type   = memory
+hw5.channels.SomeChannelHbase.type = memory
+hw5.sinks.SomeSink.type         = hdfs
+hw5.sinks.SomeSink.hdfs.path= /hw2__flume5_2/
+hw5.sinks.SomeSink.channel     = SomeChannel
+hw5.sinks.SomeSinkHbase.type = org.apache.flume.sink.hbase.HBaseSink
+hw5.sinks.SomeSinkHbase.channel = SomeChannelHbase
+hw5.sinks.SomeSinkHbase.table = Student5_2
+hw5.sinks.SomeSinkHbase.columnFamily = Some_data
+hw5.sinks.SomeSinkHbase.column = info_py
+hw5.sinks.SomeSinkHbase.batchSize = 100
+
+hw5.sinks.SomeSinkHbase.serializer = org.apache.flume.sink.hbase.SimpleHbaseEventSerializer
+hw5.sinks.SomeSinkHbase.serializer.incrementColumn=icol
+
+# Other properties are specific to each type of
+# source, channel, or sink. In this case, we
+# specify the capacity of the memory channel.
+hw5.channels.SomeChannel.capacity = 10000
+
+
